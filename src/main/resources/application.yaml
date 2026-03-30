@@ -1,0 +1,45 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+
+  config:
+    import: optional:configserver:http://localhost:8888
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/users/**
+
+            - id: booking-service
+              uri: lb://booking-service
+              predicates:
+                - Path=/api/bookings/**
+
+            - id: payment-service
+              uri: lb://payment-service
+              predicates:
+                - Path=/api/payments/**
+
+            - id: notification-service
+              uri: lb://notification-service
+              predicates:
+                - Path=/api/notifications/**
+              filters:
+                - name: RequestRateLimiter
+                  args:
+                    redis-rate-limiter.replenishRate: 10
+                    redis-rate-limiter.burstCapacity: 20
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka

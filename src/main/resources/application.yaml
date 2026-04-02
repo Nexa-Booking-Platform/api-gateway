@@ -6,7 +6,10 @@ spring:
     name: api-gateway
 
   config:
-    import: optional:configserver:http://localhost:8888
+    import: optional:configserver:http://${CONFIG_SERVER_USER:configuser}:${CONFIG_SERVER_PASSWORD:configpass}@localhost:8888
+
+jwt:
+  secret: ${JWT_SECRET:default-very-long-secret-key-at-least-256-bits-long-for-hmac-sha256}
 
   cloud:
     gateway:

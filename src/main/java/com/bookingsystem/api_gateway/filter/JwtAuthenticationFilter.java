@@ -2,12 +2,16 @@ package com.bookingsystem.api_gateway.filter;
 
 import com.bookingsystem.api_gateway.util.JwtUtil;
 import io.jsonwebtoken.Claims;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.core.Ordered;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import reactor.core.publisher.Mono;
 
-public class JwtAuthenticationFilter implements GlobalFilter {
+@Component
+public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
 
     private final JwtUtil jwtUtil;
 
@@ -17,7 +21,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange,
-                             org.springframework.cloud.gateway.filter.GatewayFilterChain chain) {
+                             GatewayFilterChain chain) {
 
         String authHeader = exchange.getRequest()
                 .getHeaders()
@@ -45,5 +49,10 @@ public class JwtAuthenticationFilter implements GlobalFilter {
         } catch (Exception ex) {
             return Mono.error(new RuntimeException("Invalid JWT"));
         }
+    }
+
+    @Override
+    public int getOrder() {
+        return -1; // Highest priority
     }
 }
